@@ -4,7 +4,7 @@ from django.urls import reverse, resolve
 
 from boards.forms import NewTopicForm
 from boards.models import Board, Topic, Post
-from .views import home, board_topics, new_topic
+from boards.views import home, board_topics, new_topic
 
 
 class HomeTest(TestCase):
