@@ -6,22 +6,6 @@
     {{ board.name }} - {{ block.super }}
 {% endblock %}
 
-
-{% block javascript %}
-    <script>
-        var infinite = new Waypoint.Infinite({
-            element: $('.infinite-container')[0],
-            onBeforePageLoad: function () {
-                $('.loading').show();
-            },
-            onAfterPageLoad: function ($items) {
-                $('.loading').hide();
-            }
-        });
-    </script>
-{% endblock %}
-
-
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'home' %}">Boards</a></li>
     <li class="breadcrumb-item active">{{ board.name }}</li>
@@ -84,16 +68,11 @@
             {% endfor %}
 
         </div>
-        <!-- include 'includes/pagination.html' %}-->
+
     </div>
 
 
-
-    <div class="loading" style="display: none;">
-        Loading...
-    </div>
-    {% if page_obj.has_next %}
-        <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}">More</a>
-    {% endif %}
-
+{% include 'includes/infinite.html' %}
 {% endblock %}
+{% block aftercontent %}{% endblock %}
+{% block javascript %}{% endblock %}

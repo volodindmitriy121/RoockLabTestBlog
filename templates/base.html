@@ -52,14 +52,16 @@
         {% block content %}
 
         {% endblock %}
+
+        {% block aftercontent %}{% endblock %}
+
     </div>
 {% endblock body %}
 
 <script src="{% static 'js/popper.min.js' %}"></script>
 <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
-<script src="{% static 'js/jquery.waypoints.min.js' %}"></script>
-<script src="{% static 'js/infinite.min.js' %}"></script>
+
 {% block javascript %}{% endblock %}
 </body>
 </html>

@@ -92,8 +92,7 @@ def board_topics(request, pk):
 
 class TopicListView(ListView):
     model = Topic
-    paginate_by = 10
-
+    paginate_by = 5
     context_object_name = 'topics'
     template_name = 'topics.html'
 
