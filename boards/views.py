@@ -9,6 +9,9 @@ from django.utils.decorators import method_decorator
 from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm
 from static.utils import check_recaptcha
+from rest_framework import generics
+from .serializers import BoardSerializer
+
 
 
 class BoardListView(ListView):
@@ -145,6 +148,36 @@ class PostListView(ListView):
         self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('pk'), pk=self.kwargs.get('topic_pk'))
         queryset = self.topic.posts.order_by('-created_at')
         return queryset
+
+
+
+
+
+
+
+
+
+class BoardList(generics.ListCreateAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
+
+
+class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # TODO: Commit=False, cleaned_data board__pk dispatch

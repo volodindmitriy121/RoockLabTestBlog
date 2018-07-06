@@ -36,4 +36,7 @@ urlpatterns = [
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
         views.PostUpdateView.as_view(), name='edit_post'),
     url('admin/', admin.site.urls),
+    #  ------------------API---------------------------
+    url(r'^api/$', views.BoardList.as_view(), name='home'),
+    url(r'^api/boards/(?P<pk>\d+)/$', views.BoardDetail.as_view(), name='board-detail'),
 ]
