@@ -8,6 +8,7 @@ from django.views.generic import UpdateView, ListView
 from django.utils.decorators import method_decorator
 from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm
+from static.utils import check_recaptcha
 
 
 class BoardListView(ListView):
@@ -47,11 +48,12 @@ def topic_posts(request, pk, topic_pk):
 
 
 @login_required
+@check_recaptcha
 def reply_topic(request, pk, topic_pk):
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
     if request.method == 'POST':
         form = PostForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and request.recaptcha_is_valid:
             post = form.save(commit=False)
             post.topic = topic
             post.created_by = request.user
@@ -61,13 +63,13 @@ def reply_topic(request, pk, topic_pk):
             topic.save()
 
             topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
-            topic_post_url = '{url}?page={page}#{id}'.format(
-                url=topic_url,
-                id=post.pk,
-                page=topic.get_page_count()
-            )
+            # topic_post_url = '{url}?page={page}#{id}'.format(
+            #     url=topic_url,
+            #     id=post.pk,
+            #     page=topic.get_page_count()
+            # )
 
-            return redirect(topic_post_url)
+            return redirect(topic_url)
     else:
         form = PostForm
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
@@ -75,7 +77,7 @@ def reply_topic(request, pk, topic_pk):
 
 def board_topics(request, pk):
     board = get_object_or_404(Board, pk=pk)
-    queryset = board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+    queryset = board.topics.order_by('-last_updated')  # .annotate(replies=Count('posts') - 1)
     page = request.GET.get('page', 1)
 
     paginator = Paginator(queryset, 20)
@@ -90,9 +92,10 @@ def board_topics(request, pk):
 
 class TopicListView(ListView):
     model = Topic
+    paginate_by = 10
+
     context_object_name = 'topics'
     template_name = 'topics.html'
-    paginate_by = 10
 
     def get_context_data(self, **kwargs):
         kwargs['board'] = self.board

@@ -27,7 +27,6 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False)
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -58,8 +57,7 @@ ROOT_URLCONF = 'RoockLabTestBlog.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,31 +95,32 @@ WSGI_APPLICATION = 'RoockLabTestBlog.wsgi.application'
 # }
 
 #
-# DATABASES = {
-#     'default':{
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': 'postgres',
-#         'USER': 'postgres',
-#         'HOST': 'db',
-#         'PORT': 5432,
-#     }
-# }
-
-#
 DATABASES = {
     'default':{
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'roocklabtestblog',
-        'USER': 'dima',
+        'NAME': 'postgres',
+        'USER': 'postgres',
         'HOST': 'db',
         'PORT': 5432,
     }
 }
 
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'roocklabtestblog',
+#         'USER': 'dima',
+#         'HOST': 'db',
+#         'PORT': 5432,
+#     }
+# }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
+
+GOOGLE_RECAPTCHA_SECRET_KEY = '6LfceWIUAAAAAAuVZ1GPQoYKbzseMFtE13KYFQJb'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
