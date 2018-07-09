@@ -4,6 +4,31 @@ from django.conf.urls import url
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
 
+from boards.views import TopicViewSet, BoardViewSet
+
+topic_list = TopicViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+topic_detail = TopicViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+board_list = BoardViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+board_detail = BoardViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
+
 urlpatterns = [
     url(r'^$', views.BoardListView.as_view(), name='home'),
 
@@ -37,6 +62,8 @@ urlpatterns = [
         views.PostUpdateView.as_view(), name='edit_post'),
     url('admin/', admin.site.urls),
     #  ------------------API---------------------------
-    url(r'^api/$', views.BoardList.as_view(), name='home'),
-    url(r'^api/boards/(?P<pk>\d+)/$', views.BoardDetail.as_view(), name='board-detail'),
+    url(r'^api/$', board_list, name='board-list'),
+    url(r'^api/boards/(?P<pk>\d+)/$', board_detail, name='board-detail'),
+    url(r'^api/boards/(?P<pk>\d+)/topics/$', topic_list, name='topic-list'),
+    url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
 ]

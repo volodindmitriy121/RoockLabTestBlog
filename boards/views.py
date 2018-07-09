@@ -9,10 +9,9 @@ from django.utils.decorators import method_decorator
 from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm
 from static.utils import check_recaptcha
-from rest_framework import generics
-from .serializers import BoardSerializer
-
-
+from rest_framework import generics, permissions
+from .serializers import BoardSerializer, TopicSerializer
+from rest_framework import viewsets
 
 class BoardListView(ListView):
     model = Board
@@ -150,34 +149,20 @@ class PostListView(ListView):
         return queryset
 
 
-
-
-
-
-
-
-
-class BoardList(generics.ListCreateAPIView):
+class BoardViewSet(viewsets.ModelViewSet):
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
+    permission_classes = (permissions.IsAdminUser,)
 
 
-class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Board.objects.all()
-    serializer_class = BoardSerializer
+class TopicViewSet(viewsets.ModelViewSet):
+    queryset = Topic.objects.all()
+    serializer_class = TopicSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-
-
-
-
-
-
-
-
-
-
-
-
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(board=self.kwargs.get('pk'))
 
 
 # TODO: Commit=False, cleaned_data board__pk dispatch

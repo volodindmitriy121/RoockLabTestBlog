@@ -11,6 +11,6 @@ class BoardSerializer(serializers.ModelSerializer):
 class TopicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Topic
-        fields = ('url', 'id', 'subject', 'last_updated', 'board', 'starter', 'views')
+        fields = ('id', 'subject', 'last_updated', 'board', 'starter', 'views')
 
 
