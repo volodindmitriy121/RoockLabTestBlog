@@ -1,3 +1,5 @@
+from django.urls import include
+
 from boards import views
 from django.contrib import admin
 from django.conf.urls import url
@@ -36,8 +38,7 @@ urlpatterns = [
     url(r'^boards/(?P<pk>\d+)/update/$', views.board_update, name='board_update'),
     url(r'^boards/(?P<pk>\d+)/delete/$', views.board_delete, name='board_delete'),
 
-
-
+    url(r'^oauth/', include('social_django.urls', namespace='social')),
 
 
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', views.PostListView.as_view(), name='topic_posts'),
