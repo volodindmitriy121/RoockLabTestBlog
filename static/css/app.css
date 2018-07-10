@@ -2,8 +2,8 @@
     font-family: 'Oswald', sans-serif;
 }
 .loader {
- border-top: 16px solid dodgerblue;
- border-right: 16px solid dodgerblue;
- border-bottom: 16px solid yellow;
- border-left: 16px  yellow;
+ /*border-top: 16px solid ;*/
+ border-right: 16px solid red;
+ /*border-bottom: 16px solid ;*/
+ border-left: 16px  black;
 }

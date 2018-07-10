@@ -12,6 +12,8 @@
    <form method="post" novalidate>
         {% csrf_token %}
         {% include 'includes/form.html' %}
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+        <div class="g-recaptcha" data-sitekey="6LfceWIUAAAAAJcyYcafZfV1gFIqI915TysR8ihQ"></div>
         <button type="submit" class="btn btn-success">Post</button>
    </form>
 {% endblock %}

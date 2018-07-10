@@ -1,5 +1,5 @@
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Count
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
@@ -7,92 +7,82 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import UpdateView, ListView
 from django.utils.decorators import method_decorator
 from boards.models import Board, Post, Topic
-from .forms import NewTopicForm, PostForm
+from .forms import NewTopicForm, PostForm, BoardForm
 from static.utils import check_recaptcha
-from rest_framework import generics, permissions
+from rest_framework import permissions
 from .serializers import BoardSerializer, TopicSerializer
 from rest_framework import viewsets
+from django.http import JsonResponse
+
+# ---------------------------------------------------------------
+
+
+def save_board_form(request, form, template_name):
+    data = {}
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            data['form_is_valid'] = True
+            boards = Board.objects.all()
+            data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards})
+        else:
+            data['form_is_valid'] = False
+    context = {'form': form}
+    data['html_form'] = render_to_string(template_name, context, request=request)
+    return JsonResponse(data)
+
+
+def board_list(request):
+    boards = Board.objects.all()
+    return render(request, 'home.html', {'boards': boards})
+
+
+def board_create(request):
+    if request.method == 'POST':
+        form = BoardForm(request.POST)
+    else:
+        form = BoardForm()
+    return save_board_form(request, form, 'partial_board_create.html')
+
+
+def board_update(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    if request.method == 'POST':
+        form = BoardForm(request.POST, instance=board)
+    else:
+        form = BoardForm(instance=board)
+    return save_board_form(request, form, 'partial_board_update.html')
+
+
+def board_delete(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    data = {}
+    if request.method == 'POST':
+        board.delete()
+        data['form_is_valid'] = True
+        boards = Board.objects.all()
+        data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards})
+    else:
+        context = {'board': board}
+        data['html_form'] = render_to_string('partial_board_delete.html', context, request=request)
+
+    return JsonResponse(data)
+# --------------------------------------------------------------
+
 
 class BoardListView(ListView):
+    """
+    /
+    """
     model = Board
     context_object_name = 'boards'
     template_name = 'home.html'
 
 
-@login_required
-def new_topic(request, pk):
-    board = get_object_or_404(Board, pk=pk)
-
-    if request.method == 'POST':
-        form = NewTopicForm(request.POST)
-
-        if form.is_valid():
-            topic = form.save(commit=False)
-            topic.board = board
-            topic.starter = request.user
-            topic.save()
-            post = Post.objects.create(
-                message=form.cleaned_data.get('message'),
-                topic=topic,
-                created_by=request.user
-            )
-            return redirect('topic_posts', pk=pk, topic_pk=topic.pk)
-    else:
-        form = NewTopicForm()
-    return render(request, 'new_topic.html', {'board': board, 'form': form})
-
-
-def topic_posts(request, pk, topic_pk):
-    topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-    topic.views += 1
-    topic.save()
-    return render(request, 'topic_posts.html', {'topic': topic})
-
-
-@login_required
-@check_recaptcha
-def reply_topic(request, pk, topic_pk):
-    topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid() and request.recaptcha_is_valid:
-            post = form.save(commit=False)
-            post.topic = topic
-            post.created_by = request.user
-            post.save()
-
-            topic.last_updated = timezone.now()
-            topic.save()
-
-            topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
-            # topic_post_url = '{url}?page={page}#{id}'.format(
-            #     url=topic_url,
-            #     id=post.pk,
-            #     page=topic.get_page_count()
-            # )
-
-            return redirect(topic_url)
-    else:
-        form = PostForm
-    return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
-
-
-def board_topics(request, pk):
-    board = get_object_or_404(Board, pk=pk)
-    queryset = board.topics.order_by('-last_updated')  # .annotate(replies=Count('posts') - 1)
-    page = request.GET.get('page', 1)
-
-    paginator = Paginator(queryset, 20)
-    try:
-        topics = paginator.page(page)
-    except PageNotAnInteger:
-        topics = paginator.page(1)
-    except EmptyPage:
-        paginator.page(paginator.num_pages)
-    return render(request, 'topics.html', {'board': board, 'topics': topics})
-
-
 class TopicListView(ListView):
+    """
+    boards/pk/
+    """
     model = Topic
     paginate_by = 5
     context_object_name = 'topics'
@@ -108,8 +98,86 @@ class TopicListView(ListView):
         return queryset
 
 
+@login_required
+@check_recaptcha
+def new_topic(request, pk):
+    """
+    /boards/pk/new
+    """
+    board = get_object_or_404(Board, pk=pk)
+
+    if request.method == 'POST':
+        form = NewTopicForm(request.POST)
+
+        if form.is_valid() and request.recaptcha_is_valid:
+            topic = form.save(commit=False)
+            topic.board = board
+            topic.starter = request.user
+            topic.save()
+            post = Post.objects.create(
+                message=form.cleaned_data.get('message'),
+                topic=topic,
+                created_by=request.user
+            )
+            return redirect('topic_posts', pk=pk, topic_pk=topic.pk)
+    else:
+        form = NewTopicForm()
+    return render(request, 'new_topic.html', {'board': board, 'form': form})
+
+
+class PostListView(ListView):
+    """
+    boards/pk/topics/pk
+    """
+    model = Post
+    context_object_name = 'posts'
+    template_name = 'topic_posts.html'
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        session_key = 'viewed_topic_{}'.format(self.topic.pk)
+        if not self.request.session.get(session_key, False):
+            self.topic.views += 1
+            self.topic.save()
+            self.request.session[session_key] = True
+        kwargs['topic'] = self.topic
+        return super().get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('pk'), pk=self.kwargs.get('topic_pk'))
+        queryset = self.topic.posts.order_by('-created_at')
+        return queryset
+
+
+@login_required
+def reply_topic(request, pk, topic_pk):
+    """
+    boards/pk/topics/pk/reply
+    """
+    topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.topic = topic
+            post.created_by = request.user
+            post.save()
+
+            topic.last_updated = timezone.now()
+            topic.save()
+
+            topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
+            return redirect(topic_url)
+    else:
+        form = PostForm
+    return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
+
+
 @method_decorator(login_required, name='dispatch')
 class PostUpdateView(UpdateView):
+    """
+    boards/pk/topics/pk/posts/pk/edit
+    """
     model = Post
     fields = ('message',)
     template_name = 'edit_post.html'
@@ -128,34 +196,22 @@ class PostUpdateView(UpdateView):
         return redirect('topic_posts', pk=post.topic.board.pk, topic_pk=post.topic.pk)
 
 
-class PostListView(ListView):
-    model = Post
-    context_object_name = 'posts'
-    template_name = 'topic_posts.html'
-    paginate_by = 5
-
-    def get_context_data(self, **kwargs):
-        session_key = 'viewed_topic_{}'.format(self.topic.pk)
-        if not self.request.session.get(session_key, False):
-            self.topic.views += 1
-            self.topic.save()
-            self.request.session[session_key] = True
-        kwargs['topic'] = self.topic
-        return super().get_context_data(**kwargs)
-
-    def get_queryset(self):
-        self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('pk'), pk=self.kwargs.get('topic_pk'))
-        queryset = self.topic.posts.order_by('-created_at')
-        return queryset
+# ---------API--------------API-------API--------API--------API---------API-------------
 
 
 class BoardViewSet(viewsets.ModelViewSet):
+    """
+    API board
+    """
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
     permission_classes = (permissions.IsAdminUser,)
 
 
 class TopicViewSet(viewsets.ModelViewSet):
+    """
+    API topics
+    """
     queryset = Topic.objects.all()
     serializer_class = TopicSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -163,9 +219,3 @@ class TopicViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(board=self.kwargs.get('pk'))
-
-
-# TODO: Commit=False, cleaned_data board__pk dispatch
-'''Very important: in the view reply_topic we are using topic_pk because we are referring to the 
-keyword argument of the function, in the view new_topic we are using topic.pk 
-because a topic is an object (Topic model instance) and .pk we are accessing the pk property of the Topic model instance. Small detail, big difference.'''

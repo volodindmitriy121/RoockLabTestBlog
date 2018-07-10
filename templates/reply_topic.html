@@ -38,14 +38,14 @@
 {% block content %}
 
 
-    <form method="post" class="mb-4" novalidate>
+    <form method="post" class="mb-4" novalidate id="reply_form">
         {% csrf_token %}
         {% include 'includes/form.html' %}
 
-         <script src='https://www.google.com/recaptcha/api.js'></script>
-        <div class="g-recaptcha" data-sitekey="6LfceWIUAAAAAJcyYcafZfV1gFIqI915TysR8ihQ"></div>
+        <input type="text" name="message">
 
-        <button type="submit" class="btn btn-success">Post a reply</button>
+
+        <button type="submit" class="btn btn-success js-reply-button">Post a reply</button>
     </form>
 
 

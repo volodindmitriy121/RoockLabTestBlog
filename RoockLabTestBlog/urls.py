@@ -30,7 +30,15 @@ board_detail = BoardViewSet.as_view({
 
 
 urlpatterns = [
-    url(r'^$', views.BoardListView.as_view(), name='home'),
+    # url(r'^$', views.BoardListView.as_view(), name='home'),
+    url(r'^$', views.board_list, name='home'),
+    url(r'^boards/create/$', views.board_create, name='board_create'),
+    url(r'^boards/(?P<pk>\d+)/update/$', views.board_update, name='board_update'),
+    url(r'^boards/(?P<pk>\d+)/delete/$', views.board_delete, name='board_delete'),
+
+
+
+
 
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', views.PostListView.as_view(), name='topic_posts'),
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/reply/$', views.reply_topic, name='reply_topic'),
@@ -61,6 +69,8 @@ urlpatterns = [
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
         views.PostUpdateView.as_view(), name='edit_post'),
     url('admin/', admin.site.urls),
+
+
     #  ------------------API---------------------------
     url(r'^api/$', board_list, name='board-list'),
     url(r'^api/boards/(?P<pk>\d+)/$', board_detail, name='board-detail'),
