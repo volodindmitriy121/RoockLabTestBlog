@@ -82,28 +82,30 @@ def reply_post(request, pk, topic_pk):
     data = {}
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
     print(request.method)
-    print(request.POST.get('message'))
+    print(request.POST)
     if request.method == 'POST':
         form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.topic = topic
-            post.created_by = request.user
-            post.save()
 
-            topic.last_updated = timezone.now()
-            topic.save()
+        post = form.save(commit=False)
+        post.topic = topic
+        post.created_by = request.user
+        post.save()
 
-            data['message'] = post.message
-            data['topic'] = str(post.topic)
-            data['created_by'] = post.created_by.username
-            data['created_at'] = post.created_at
+        topic.last_updated = timezone.now()
+        topic.save()
 
-            topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
-            data['topic_url'] = topic_url
+        data['template'] = render_to_string('reply_topic.html', {'topic': topic, 'form': form})
+        data['message'] = request.POST.get('the_post')
+        data['topic'] = str(post.topic)
+        data['created_by'] = post.created_by.username
+        data['created_at'] = post.created_at
 
-            return JsonResponse(data)
+        # topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
+        # data['topic_url'] = topic_url
+        print('data')
+        return JsonResponse(data)
     else:
+        print('else')
         form = PostForm()
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
 
