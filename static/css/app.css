@@ -1,9 +1,10 @@
 .navbar-brand {
     font-family: 'Oswald', sans-serif;
 }
+
 .loader {
- /*border-top: 16px solid ;*/
- border-right: 16px solid red;
- /*border-bottom: 16px solid ;*/
- border-left: 16px  black;
+    border-top: 16px solid black;
+    border-right: 16px solid red;
+    border-bottom: 16px solid black;
+    border-left: 16px solid red;
 }

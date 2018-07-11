@@ -46,6 +46,7 @@ urlpatterns = [
     url(r'^signup/$', accounts_views.signup, name='signup'),
     url(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
+
     url(r'^settings/account/$', accounts_views.UserUpdateView.as_view(), name='my_account'),
 
     url(r'^reset/$', auth_views.PasswordResetView.as_view(template_name='password_reset.html',

@@ -13,9 +13,12 @@ from rest_framework import permissions
 from .serializers import BoardSerializer, TopicSerializer
 from rest_framework import viewsets
 from django.http import JsonResponse
-
+from social_django.models import UserSocialAuth
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import AdminPasswordChangeForm, PasswordChangeForm
+from django.contrib import messages
 # ---------------------------------------------------------------
-
+# Block of ajax boards views
 
 def save_board_form(request, form, template_name):
     data = {}
@@ -67,8 +70,11 @@ def board_delete(request, pk):
         data['html_form'] = render_to_string('partial_board_delete.html', context, request=request)
 
     return JsonResponse(data)
+
 # --------------------------------------------------------------
 
+
+# --------------------------------------------------------------
 
 class BoardListView(ListView):
     """
@@ -130,9 +136,10 @@ class PostListView(ListView):
     boards/pk/topics/pk
     """
     model = Post
+    paginate_by = 10
     context_object_name = 'posts'
     template_name = 'topic_posts.html'
-    paginate_by = 10
+
 
     def get_context_data(self, **kwargs):
         session_key = 'viewed_topic_{}'.format(self.topic.pk)

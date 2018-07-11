@@ -12,67 +12,67 @@
 {% endblock %}
 
 {% block content %}
-    <div class="infinite-container">
-        <div class="mb-4">
-            <a href="{% url 'new_topic' board.pk %}" class="btn btn-primary">New topic</a>
-        </div>
+
+    <div class="mb-4">
+        <a href="{% url 'new_topic' board.pk %}" class="btn btn-primary">New topic</a>
+    </div>
 
 
-        <div class="container">
-            <div class="row">
-                <div class="col-sm">
-                    Topic
-                </div>
-                <div class="col-sm">
-                    Starter
-                </div>
-                <div class="col-sm">
-                    Replies
-                </div>
-                <div class="col-sm">
-                    Views
-                </div>
-                <div class="col-sm">
-                    Last update
-                </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                Topic
+            </div>
+            <div class="col-sm">
+                Starter
+            </div>
+            <div class="col-sm">
+                Replies
+            </div>
+            <div class="col-sm">
+                Views
+            </div>
+            <div class="col-sm">
+                Last update
             </div>
         </div>
+    </div>
 
-        <div class="infinite-item">
 
-            {% for topic in topics %}
-
-                {% url 'topic_posts' board.pk topic.pk as topic_url %}
-                <div class="row">
-                    <div class="col-sm">
-                        <p class="mb-0">
-                            <a href="{{ topic_url }}">{{ topic.subject }}</a>
-                        </p>
-                        <small class="text-muted">
-                            Pages:
-                            {% for i in topic.get_page_range %}
-                                <a href="{{ topic_url }}?page={{ i }}">{{ i }}</a>
-                            {% endfor %}
-                            {% if topic.has_many_pages %}
-                                ...<a href="{{ topic_url }}?page={{ topic.get_page_count }}">Last Page</a>
-                            {% endif %}
-                        </small>
-                    </div>
-
-                    <div class="col-sm">{{ topic.starter.username }}</div>
-                    <div class="col-sm">{{ topic.replies }}</div>
-                    <div class="col-sm">{{ topic.views }}</div>
-                    <div class="col-sm">{{ topic.last_updated|naturaltime }}</div>
+    <div class="infinite-container">
+        {% for topic in topics %}
+            <div class="infinite-item">
+            {% url 'topic_posts' board.pk topic.pk as topic_url %}
+            <div class="row">
+                <div class="col-sm">
+                    <p class="mb-0">
+                        <a href="{{ topic_url }}">{{ topic.subject }}</a>
+                    </p>
+                    <small class="text-muted">
+                        Pages:
+                        {% for i in topic.get_page_range %}
+                            <a href="{{ topic_url }}?page={{ i }}">{{ i }}</a>
+                        {% endfor %}
+                        {% if topic.has_many_pages %}
+                            ...<a href="{{ topic_url }}?page={{ topic.get_page_count }}">Last Page</a>
+                        {% endif %}
+                    </small>
                 </div>
 
-            {% endfor %}
+                <div class="col-sm">{{ topic.starter.username }}</div>
+                <div class="col-sm">{{ topic.replies }}</div>
+                <div class="col-sm">{{ topic.views }}</div>
+                <div class="col-sm">{{ topic.last_updated|naturaltime }}</div>
+            </div>
+
+        {% endfor %}
 
         </div>
 
     </div>
 
 
-{% include 'includes/infinite.html' %}
+    {% include 'includes/infinite.html' %}
 {% endblock %}
 {% block aftercontent %}{% endblock %}
 {% block javascript %}{% endblock %}
