@@ -13,12 +13,11 @@ from rest_framework import permissions
 from .serializers import BoardSerializer, TopicSerializer
 from rest_framework import viewsets
 from django.http import JsonResponse
-from social_django.models import UserSocialAuth
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import AdminPasswordChangeForm, PasswordChangeForm
-from django.contrib import messages
+
+
 # ---------------------------------------------------------------
 # Block of ajax boards views
+
 
 def save_board_form(request, form, template_name):
     data = {}
@@ -71,10 +70,80 @@ def board_delete(request, pk):
 
     return JsonResponse(data)
 
+
 # --------------------------------------------------------------
 
 
+# @login_required
+# def reply_post(request, pk, topic_pk):
+#     """
+#     boards/pk/topics/pk/reply
+#     """
+#     data = {}
+#     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+#     if request.method == 'POST':
+#         form = PostForm(request.POST)
+#         if form.is_valid():
+#             post = form.save(commit=False)
+#             post.topic = topic
+#             post.created_by = request.user
+#             post.save()
+#
+#             topic.last_updated = timezone.now()
+#             topic.save()
+#
+#             data['message'] = post.message
+#             data['topic'] = str(post.topic)
+#             data['created_by'] = post.created_by.username
+#             data['created_at'] = post.created_at
+#
+#             topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
+#             data['topic_url'] = topic_url
+#
+#             return JsonResponse(data)
+#     else:
+#
+#         form = PostForm()
+#     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
+
+
+@login_required
+def reply_post(request, pk, topic_pk):
+    """
+    boards/pk/topics/pk/reply
+    """
+    data = {}
+    topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.topic = topic
+            post.created_by = request.user
+            post.save()
+
+            topic.last_updated = timezone.now()
+            topic.save()
+
+            data['message'] = post.message
+            data['topic'] = str(post.topic)
+            data['created_by'] = post.created_by.username
+            data['created_at'] = post.created_at
+
+            topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
+            data['topic_url'] = topic_url
+            return JsonResponse(data)
+    else:
+        form = PostForm()
+    return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
+
+
+
+
+
+
 # --------------------------------------------------------------
+
 
 class BoardListView(ListView):
     """
@@ -139,7 +208,6 @@ class PostListView(ListView):
     paginate_by = 10
     context_object_name = 'posts'
     template_name = 'topic_posts.html'
-
 
     def get_context_data(self, **kwargs):
         session_key = 'viewed_topic_{}'.format(self.topic.pk)

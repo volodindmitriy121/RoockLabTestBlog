@@ -2,15 +2,44 @@
 
 {% load static %}
 
+
+{% block title %}Post a reply{% endblock %}
+
 {% block stylesheet %}
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 {% endblock %}
 
 
+{% block javascript %}
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        var simplemde = new SimpleMDE();
+    </script>
 
 
 
-{% block title %}Post a reply{% endblock %}
+    <script>
+
+
+        $('#reply-post').on('submit', function () {
+            $.ajax({
+                url: "reply_topic", // the endpoint
+                type: "POST", // http method
+                data: {the_post: $('#post-text').val()}, // data sent with the post request
+
+                // handle a successful response
+                success: function (json) {
+                    $('#fo').html("<p>fuck off</p>")
+
+                },
+            })
+        })
+
+    </script>
+
+
+
+{% endblock %}
 
 
 
@@ -22,36 +51,17 @@
 {% endblock %}
 
 
-
-
-{% block javascript %}
-
-  <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-  <script>
-    var simplemde = new SimpleMDE();
-  </script>
-
-
-
-{% endblock %}
-
 {% block content %}
 
 
-    <form method="post" class="mb-4" novalidate id="reply_form">
+    <form method="post" class="mb-4">
         {% csrf_token %}
         {% include 'includes/form.html' %}
-
-        <input type="text" name="message">
-
-
-        <button type="submit" class="btn btn-success js-reply-button">Post a reply</button>
+        <button type="submit" class="btn btn-success" id="reply-post">Post a reply</button>
     </form>
 
-
-
-
-    {% for post in topic.get_last_ten_posts%}
+    <div id="fo"></div>
+    {% for post in topic.get_last_ten_posts %}
         <div class="card mb-2">
             <div class="card-body p-3">
                 <div class="row mb-3">

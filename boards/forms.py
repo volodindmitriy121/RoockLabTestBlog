@@ -16,7 +16,13 @@ class NewTopicForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['message', ]
+        fields = ['message']
+        widgets = {
+            'message': forms.TextInput(attrs={
+                'id': 'post-text',
+                'required': True,
+                'placeholder': 'Say something...'
+            }), }
 
 
 class BoardForm(forms.ModelForm):
