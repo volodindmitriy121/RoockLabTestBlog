@@ -74,39 +74,6 @@ def board_delete(request, pk):
 # --------------------------------------------------------------
 
 
-# @login_required
-# def reply_post(request, pk, topic_pk):
-#     """
-#     boards/pk/topics/pk/reply
-#     """
-#     data = {}
-#     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-#     if request.method == 'POST':
-#         form = PostForm(request.POST)
-#         if form.is_valid():
-#             post = form.save(commit=False)
-#             post.topic = topic
-#             post.created_by = request.user
-#             post.save()
-#
-#             topic.last_updated = timezone.now()
-#             topic.save()
-#
-#             data['message'] = post.message
-#             data['topic'] = str(post.topic)
-#             data['created_by'] = post.created_by.username
-#             data['created_at'] = post.created_at
-#
-#             topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
-#             data['topic_url'] = topic_url
-#
-#             return JsonResponse(data)
-#     else:
-#
-#         form = PostForm()
-#     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
-
-
 @login_required
 def reply_post(request, pk, topic_pk):
     """
@@ -114,6 +81,8 @@ def reply_post(request, pk, topic_pk):
     """
     data = {}
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
+    print(request.method)
+    print(request.POST.get('message'))
     if request.method == 'POST':
         form = PostForm(request.POST)
         if form.is_valid():
@@ -132,11 +101,11 @@ def reply_post(request, pk, topic_pk):
 
             topic_url = reverse('topic_posts', kwargs={'pk': pk, 'topic_pk': topic_pk})
             data['topic_url'] = topic_url
+
             return JsonResponse(data)
     else:
         form = PostForm()
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
-
 
 
 
