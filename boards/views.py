@@ -29,7 +29,8 @@ def save_board_form(request, form, template_name):
             form.save()
             data['form_is_valid'] = True
             boards = Board.objects.all()
-            data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards})
+            board = Board.objects.last()
+            data['html_board_list'] = render_to_string('tr_board.html', {'board': board})
         else:
             data['form_is_valid'] = False
     context = {'form': form}
