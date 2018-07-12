@@ -6,7 +6,18 @@ from django.conf.urls import url
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
 
-from boards.views import TopicViewSet, BoardViewSet
+from boards.views import TopicViewSet, BoardViewSet, PostViewSet
+
+post_list = PostViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+post_detail = PostViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
 
 topic_list = TopicViewSet.as_view({
     'get': 'list',
@@ -86,6 +97,8 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/$', board_detail, name='board-detail'),
     url(r'^api/boards/(?P<pk>\d+)/topics/$', topic_list, name='topic-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
+    url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/$', post_list, name='post-list'),
+    url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/$', post_detail, name='post-detail'),
 ]
 
 

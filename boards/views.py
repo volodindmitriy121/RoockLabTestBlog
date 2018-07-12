@@ -13,7 +13,7 @@ from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm, BoardForm
 from static.utils import check_recaptcha
 from rest_framework import permissions
-from .serializers import BoardSerializer, TopicSerializer
+from .serializers import BoardSerializer, TopicSerializer, PostSerializer
 from rest_framework import viewsets
 from django.http import JsonResponse
 
@@ -323,3 +323,16 @@ class TopicViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(board=self.kwargs.get('pk'))
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    """
+    API posts
+    """
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(topic__board=self.kwargs.get('pk'), topic=self.kwargs.get('topic_pk'))
