@@ -71,8 +71,13 @@ urlpatterns = [
         name='password_change_done'),
     url(r'^boards/(?P<pk>\d+)/$', views.TopicListView.as_view(), name='board_topics'),
     url(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
+
+
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
         views.PostUpdateView.as_view(), name='edit_post'),
+    url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/delete/$',
+        views.delete_post, name='post_delete'),
+
     url('admin/', admin.site.urls),
 
 
@@ -82,3 +87,5 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/topics/$', topic_list, name='topic-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
 ]
+
+

@@ -47,4 +47,5 @@ $('document').ready(function () {
     $('#board-table').on('click', '.js-delete-board', loadForm);
     $('#modal-board').on('submit', '.js-board-delete-form', saveForm);
 
+
 });
