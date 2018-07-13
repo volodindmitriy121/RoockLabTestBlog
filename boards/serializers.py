@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Board, Topic, Post
+from .models import Board, Topic, Post, BoardHistory
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -18,3 +18,9 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('id', 'message', 'topic', 'created_at', 'created_by', 'updated_at', 'updated_by')
+
+
+class BoardHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardHistory
+        fields = ('id', 'board', 'action', 'action_at')

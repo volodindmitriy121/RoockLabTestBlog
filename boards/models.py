@@ -1,12 +1,15 @@
 import math
-
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save, post_delete, pre_delete
 from django.dispatch import receiver
 from django.utils.text import Truncator
 from django.utils.html import mark_safe
 from markdown import markdown
+from rest_framework.authtoken.models import Token
+
+
+
 
 
 class Board(models.Model):
@@ -21,6 +24,17 @@ class Board(models.Model):
 
     def get_last_post(self):
         return Post.objects.filter(topic__board=self).order_by('-created_at').first()
+
+
+class BoardHistory(models.Model):
+
+    action = models.CharField(max_length=255)
+    board = models.ForeignKey(Board, related_name='history', on_delete=models.SET(0))
+    action_at = models.DateTimeField(auto_now_add=True)
+
+    def get_last_five(self):
+        return self.objects.order_by('-action_at')[:5]
+
 
 
 class Topic(models.Model):
@@ -73,18 +87,25 @@ class Post(models.Model):
 def board_create(sender, **kwargs):
     if kwargs.get('created'):
         board = Board.objects.get(pk=kwargs.get('instance').pk)
+        BoardHistory.objects.create(board=board, action='Board created')
         print('Board created')
     elif not kwargs.get('created'):
         board = Board.objects.get(pk=kwargs.get('instance').pk)
+        BoardHistory.objects.create(board=board, action='Board updated')
         print('Board updated')
 
 
 @receiver(post_delete, sender=Board)
 def b_delete(sender, **kwargs):
+    board = Board.objects.get(pk=kwargs.get('instance').pk)
+    BoardHistory.objects.create(board=board, action='Board deleted')
     print('Board deleted')
 
 
-
+@receiver(post_save, sender= User)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
 
 # TODO: related name, auto_now_add
 '''The double underscores topic__board is used to navigate through the models’ relationships. Under the hoods, 

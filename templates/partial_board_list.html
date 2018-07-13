@@ -6,7 +6,7 @@
             <small class="text-muted d-block">{{ board.description }}</small>
         </td>
         <td class="align-middle">
-            {{ board.get_posts_count }}
+            {{ board.get_post_count }}
         </td>
         <td class="align-middle">
             {{ board.topics.count }}
@@ -26,21 +26,23 @@
                 {% endif %}
             {% endwith %}
         </td>
+        {{ user }}
+        {% if user.is_superuser or user.is_staff %}
 
-        <td>
-            <button type="button"
-                    class="btn btn-warning btn-sm js-update-board"
-                    data-url="{% url 'board_update' board.id %}">
-                Edit
-            </button>
-            <button type="button"
-                    class="btn btn-danger btn-sm js-delete-board"
-                    data-url="{% url 'board_delete' board.id %}">
-                Delete
-            </button>
+            <td>
+                <button type="button"
+                        class="btn btn-warning btn-sm js-update-board"
+                        data-url="{% url 'board_update' board.id %}">
+                    Edit
+                </button>
+                <button type="button"
+                        class="btn btn-danger btn-sm js-delete-board"
+                        data-url="{% url 'board_delete' board.id %}">
+                    Delete
+                </button>
 
-        </td>
-
+            </td>
+        {% endif %}
     </tr>
 {% empty %}
     <tr>

@@ -57,13 +57,34 @@ $('document').ready(function () {
         return false;
     };
 
+        let updateBoard = function () {
+        let form = $(this);
+        $.ajax({
+            url: form.attr("action"),
+            data: form.serialize(),
+            type: form.attr("method"),
+            dataType: 'json',
+            success: function (data) {
+                if (data.form_is_valid) {
+                    $("#board-table tbody  ").html(data.html_board_list);
+                    $("#modal-board").modal("hide");
+                }
+                else {
+                    $("#modal-board .modal-content").html(data.html_form);
+                }
+            }
+
+        });
+        return false;
+    };
+
 
     $(".js-create-board").click(loadForm);
-    $("#modal-board").on("submit", ".js-board-create-form", addBoard);
+    $("#modal-board").on("submit", ".js-board-create-form", saveForm);
 
     // Update board
     $("#board-table").on("click", ".js-update-board", loadForm);
-    $("#modal-board").on("submit", ".js-board-update-form", addBoard);
+    $("#modal-board").on("submit", ".js-board-update-form", saveForm);
 
     $('#board-table').on('click', '.js-delete-board', loadForm);
     $('#modal-board').on('submit', '.js-board-delete-form', saveForm);
