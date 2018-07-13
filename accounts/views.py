@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from accounts.forms import SignUpForm
+from accounts.forms import SignUpForm, StaffSignUpForm
 from django.utils.decorators import method_decorator
 from django.views.generic import UpdateView
 from django.urls import reverse_lazy
@@ -29,3 +29,15 @@ class UserUpdateView(UpdateView):
 
     def get_object(self):
         return self.request.user
+
+
+def staff_signup(request):
+    if request.method == 'POST':
+        form = StaffSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            return redirect('home')
+    else:
+        form = StaffSignUpForm()
+    return render(request, 'staff-signup.html', {'form': form})

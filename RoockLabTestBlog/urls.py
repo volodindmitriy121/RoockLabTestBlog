@@ -54,9 +54,9 @@ urlpatterns = [
 
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', views.PostListView.as_view(), name='topic_posts'),
 
-    # url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/reply/$', views.reply_topic, name='reply_topic'),
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/reply/$', views.reply_post, name='reply_topic'),
 
+    url(r'^signup/staff/$', accounts_views.staff_signup, name='staff-signup'),
     url(r'^signup/$', accounts_views.signup, name='signup'),
     url(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
@@ -80,8 +80,10 @@ urlpatterns = [
     url(r'^settings/password/done/$',
         auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
         name='password_change_done'),
-    url(r'^boards/(?P<pk>\d+)/$', views.TopicListView.as_view(), name='board_topics'),
+
     url(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
+    url(r'^boards/(?P<pk>\d+)/$', views.TopicListView.as_view(), name='board_topics'),
+
 
 
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
@@ -99,6 +101,7 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/$', post_list, name='post-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/$', post_detail, name='post-detail'),
+
 ]
 
 

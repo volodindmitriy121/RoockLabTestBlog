@@ -2,6 +2,8 @@ import math
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.utils.text import Truncator
 from django.utils.html import mark_safe
 from markdown import markdown
@@ -65,6 +67,23 @@ class Post(models.Model):
 
     def get_message_as_markdown(self):
         return mark_safe(markdown(self.message, safe_mode='escape'))
+
+
+@receiver(post_save, sender=Board)
+def board_create(sender, **kwargs):
+    if kwargs.get('created'):
+        board = Board.objects.get(pk=kwargs.get('instance').pk)
+        print('Board created')
+    elif not kwargs.get('created'):
+        board = Board.objects.get(pk=kwargs.get('instance').pk)
+        print('Board updated')
+
+
+@receiver(post_delete, sender=Board)
+def b_delete(sender, **kwargs):
+    print('Board deleted')
+
+
 
 
 # TODO: related name, auto_now_add

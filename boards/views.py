@@ -1,13 +1,12 @@
 from django.db.models import Count
 from django.template.loader import render_to_string
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.views import View
+
 from django.views.generic import UpdateView, ListView, DeleteView
 from django.utils.decorators import method_decorator
-from django.views.generic.detail import SingleObjectMixin
 
 from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm, BoardForm
@@ -22,14 +21,27 @@ from django.http import JsonResponse
 # Block of ajax boards views
 
 
+def action_send(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    data= {}
+    if request.method == 'POST':
+        data['result'] = request.POST.get('action')
+        data['templete'] = render_to_string('action.html', {'board': board})
+        return JsonResponse(data)
+    else:
+        pass
+
+
+
+
 def save_board_form(request, form, template_name):
     data = {}
     if request.method == "POST":
         if form.is_valid():
             form.save()
             data['form_is_valid'] = True
-            boards = Board.objects.all()
-            board = Board.objects.last()
+
+            board = Board.objects.get(pk=form.instance.pk)
             data['html_board_list'] = render_to_string('tr_board.html', {'board': board})
         else:
             data['form_is_valid'] = False
@@ -77,49 +89,16 @@ def board_delete(request, pk):
 
 def delete_post(request, pk, topic_pk, post_pk):
     data = {}
-    print('im out delete')
     post = get_object_or_404(Post, pk=post_pk)
-    print('im out delete')
     if request.method == 'DELETE':
 
         data['post_id'] = post.pk
         post.delete()
-
-
-
         data['msg'] = 'Post was deleted.'
-
-        posts = Post.objects.all()
-        # data['html_post_list'] = render_to_string('topic_posts.html', {
-        #     'posts': posts
-        # })
-
         return JsonResponse(data)
     else:
         return JsonResponse({'result': 'nothing happened'})
 
-
-# class PostDeleteView(SingleObjectMixin, View):
-#     """
-#     Works like DeleteView, but without confirmation screens or a success_url.
-#     """
-#
-    # def get_queryset(self):
-    #     self.topic = get_object_or_404(Topic, board__pk=self.kwargs.get('pk'), pk=self.kwargs.get('topic_pk'))
-    #     queryset = self.topic.posts.order_by('-created_at')
-    #     return queryset
-
-#     def delete(self, *args, **kwargs):
-#         data={}
-#         data['form_is_valid'] = True
-#         data['msg'] = 'Post was deleted.'
-#         posts = Post.objects.all()
-#         data['html_post_list'] = render_to_string('partial_post_list.html', {
-#             'posts': posts
-#         })
-#         self.object = self.get_object()
-#         self.object.delete()
-#         return JsonResponse(data)
 
 # --------------------------------------------------------------
 
@@ -147,7 +126,6 @@ def reply_post(request, pk, topic_pk):
         data['topic'] = str(post.topic)
         data['created_by'] = post.created_by.username
         data['created_at'] = post.created_at
-
 
         return JsonResponse(data)
     else:
@@ -208,6 +186,7 @@ def new_topic(request, pk):
                 topic=topic,
                 created_by=request.user
             )
+            post_save.connect(create_board, sender=Board)
             return redirect('topic_posts', pk=pk, topic_pk=topic.pk)
     else:
         form = NewTopicForm()
@@ -219,7 +198,7 @@ class PostListView(ListView):
     boards/pk/topics/pk
     """
     model = Post
-    paginate_by = 5
+    paginate_by = 1
     context_object_name = 'posts'
     template_name = 'topic_posts.html'
 
@@ -260,9 +239,6 @@ def reply_topic(request, pk, topic_pk):
     else:
         form = PostForm
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
-
-
-
 
 
 @method_decorator(login_required, name='dispatch')

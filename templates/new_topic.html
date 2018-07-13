@@ -9,34 +9,34 @@
 {% endblock %}
 
 
-{% block javascript %}
-    <script>
-
-
-        $('#new-topic-btn').on('click', function () {
-            let btn = $(this);
-            createTopic(btn);
-        });
-
-        function createTopic(btn) {
-            $.ajax({
-                url: btn.attr('data-url'),
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    сsrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                    "subject": "",
-                    "board": null,
-                    "starter": null,
-                    "views": null
-                },
-
-            })
-        }
-
-
-    </script>
-{% endblock %}
+{#{% block javascript %}#}
+{#    <script>#}
+{##}
+{##}
+{#        $('#new-topic-btn').on('click', function () {#}
+{#            let btn = $(this);#}
+{#            createTopic(btn);#}
+{#        });#}
+{##}
+{#        function createTopic(btn) {#}
+{#            $.ajax({#}
+{#                url: btn.attr('data-url'),#}
+{#                type: 'POST',#}
+{#                dataType: 'json',#}
+{#                data: {#}
+{#                    сsrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),#}
+{#                    "subject": "",#}
+{#                    "board": null,#}
+{#                    "starter": null,#}
+{#                    "views": null#}
+{#                },#}
+{##}
+{#            })#}
+{#        }#}
+{##}
+{##}
+{#    </script>#}
+{#{% endblock %}#}
 
 
 
@@ -46,7 +46,7 @@
         {% include 'includes/form.html' %}
         <script src='https://www.google.com/recaptcha/api.js'></script>
         <div class="g-recaptcha" data-sitekey="6LfceWIUAAAAAJcyYcafZfV1gFIqI915TysR8ihQ"></div>
-        <button type="button" class="btn btn-success" id="new-topic-btn" data-url="{% url 'board_topics' board.pk %}">
+        <button type="submit" class="btn btn-success" id="new-topic-btn" data-url="{% url 'board_topics' board.pk %}">
             Post
         </button>
     </form>

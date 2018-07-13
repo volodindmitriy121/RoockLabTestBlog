@@ -63,7 +63,7 @@ $('document').ready(function () {
 
     // Update board
     $("#board-table").on("click", ".js-update-board", loadForm);
-    $("#modal-board").on("submit", ".js-board-update-form", saveForm);
+    $("#modal-board").on("submit", ".js-board-update-form", addBoard);
 
     $('#board-table').on('click', '.js-delete-board', loadForm);
     $('#modal-board').on('submit', '.js-board-delete-form', saveForm);

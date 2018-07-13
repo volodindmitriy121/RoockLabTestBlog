@@ -34,6 +34,7 @@
         </tr>
         </thead>
         <tbody>
+
         {% if user.is_superuser %}
             {% include 'partial_board_list.html' %}
         {% else %}
@@ -69,6 +70,12 @@
         {% endif %}
         </tbody>
     </table>
+    <div class="text-right">
+    <div class="module" id="recent-actions-module">
+            <h2>Recent actions</h2>
+            <div id="action-list"></div>
+        </div>
+</div>
 
     <div class="modal fade" id="modal-board">
         <div class="modal-dialog">
