@@ -6,7 +6,7 @@ from django.conf.urls import url
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
 
-from boards.views import TopicViewSet, BoardViewSet, PostViewSet
+from boards.views import TopicViewSet, BoardViewSet, PostViewSet, HistoryViewSet
 
 post_list = PostViewSet.as_view({
     'get': 'list',
@@ -40,6 +40,18 @@ board_detail = BoardViewSet.as_view({
     'patch': 'partial_update',
     'delete': 'destroy'
 })
+
+history_list = HistoryViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+history_detail = HistoryViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy'
+})
+
 
 
 urlpatterns = [
@@ -101,6 +113,9 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/$', post_list, name='post-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/$', post_detail, name='post-detail'),
+
+    url(r'^api/history/$', history_list, name='history-list'),
+    url(r'^api/history/(?P<pk>\d+)/$', history_detail, name='history-detail'),
 
 ]
 

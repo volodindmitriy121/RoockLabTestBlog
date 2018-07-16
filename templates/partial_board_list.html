@@ -28,6 +28,7 @@
         </td>
 
         <td>
+            {% if user.is_superuser %}
             <button type="button"
                     class="btn btn-warning btn-sm js-update-board"
                     data-url="{% url 'board_update' board.id %}">
@@ -38,6 +39,7 @@
                     data-url="{% url 'board_delete' board.id %}">
                 Delete
             </button>
+            {% endif %}
 
         </td>
 

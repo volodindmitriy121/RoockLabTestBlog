@@ -70,11 +70,13 @@
         {% endif %}
         </tbody>
     </table>
-    <div class="text-right">
+
+<div class="text-right">
     <div class="module" id="recent-actions-module">
-            <h2>Recent actions</h2>
-            <div id="action-list"></div>
-        </div>
+        <h2>Recent actions</h2>
+        <div id="action-list"></div>
+        {% include 'actions.html' %}
+    </div>
 </div>
 
     <div class="modal fade" id="modal-board">

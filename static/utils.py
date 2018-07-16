@@ -5,6 +5,8 @@ from django.contrib import messages
 
 import requests
 
+from boards.models import History
+
 
 def check_recaptcha(view_func):
     @wraps(view_func)
@@ -28,3 +30,5 @@ def check_recaptcha(view_func):
     return _wrapped_view
 
 
+def get_last_five_history():
+    return History.objects.order_by('-action_at')[:5]

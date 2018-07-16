@@ -1,3 +1,4 @@
+from django.core import serializers
 from django.db.models import Count
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -8,28 +9,17 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import UpdateView, ListView, DeleteView
 from django.utils.decorators import method_decorator
 
-from boards.models import Board, Post, Topic#, BoardHistory
+from boards.models import Board, Post, Topic, History
 from .forms import NewTopicForm, PostForm, BoardForm
-from static.utils import check_recaptcha
+from static.utils import check_recaptcha, get_last_five_history
 from rest_framework import permissions
-from .serializers import BoardSerializer, TopicSerializer, PostSerializer#, BoardHistorySerializer
+from .serializers import BoardSerializer, TopicSerializer, PostSerializer, HistorySerializer
 from rest_framework import viewsets
 from django.http import JsonResponse, HttpResponse
 
 
 # ---------------------------------------------------------------
 # Block of ajax boards views
-
-#
-# def action_send(request):
-#     # board = get_object_or_404(Board, pk=pk)
-#     data= {}
-#     if request.method == 'POST':
-#         data['result'] = request.POST.get('action')
-#         data['templete'] = render_to_string('action.html') #, {'board': board})
-#         return JsonResponse(data)
-#     else:
-#         HttpResponse(404)
 
 
 def save_board_form(request, form, template_name):
@@ -40,6 +30,12 @@ def save_board_form(request, form, template_name):
             print(request.user)
             form.save()
             data['form_is_valid'] = True
+
+            action_json = History.objects.order_by('-action_at')[:5]
+
+            data['html_actions'] = render_to_string('actions.html',
+                                               {'actions': action_json, 'user': request.user})
+
             boards = Board.objects.all()
             data['html_board_list'] = render_to_string('partial_board_list.html',
                                                        {'boards': boards, 'user': request.user})
@@ -52,7 +48,7 @@ def save_board_form(request, form, template_name):
 
 def board_list(request):
     boards = Board.objects.all()
-    return render(request, 'home.html', {'boards': boards})
+    return render(request, 'home.html', {'boards': boards, 'user': request.user})
 
 
 def board_create(request):
@@ -81,6 +77,9 @@ def board_delete(request, pk):
         board.delete()
         data['form_is_valid'] = True
         boards = Board.objects.all()
+        action_json = History.objects.order_by('-action_at')[:5]
+        data['html_actions'] = render_to_string('actions.html',
+                                           {'actions': action_json, 'user': request.user})
         data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards, 'user': request.user})
     else:
         context = {'board': board}
@@ -97,6 +96,7 @@ def delete_post(request, pk, topic_pk, post_pk):
         data['post_id'] = post.pk
         post.delete()
         data['msg'] = 'Post was deleted.'
+
         return JsonResponse(data)
     else:
         return JsonResponse({'result': 'nothing happened'})
@@ -112,7 +112,7 @@ def reply_post(request, pk, topic_pk):
     """
     data = {}
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-    if request.method == 'POST':
+    if request.me123thod == 'POST':
         form = PostForm(request.POST)
 
         post = form.save(commit=False)
@@ -290,14 +290,14 @@ class BoardViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAdminUser,)
 
 
-# class BoardHistoryViewSet(viewsets.ModelViewSet):
-#     """
-#     API board history
-#     """
-#     queryset = BoardHistory.objects.all()
-#     serializer_class = BoardHistorySerializer
-#     permission_classes = (permissions.IsAdminUser,)
-#
+class HistoryViewSet(viewsets.ModelViewSet):
+    """
+    API board history
+    """
+    queryset = History.objects.all()
+    serializer_class = HistorySerializer
+    permission_classes = (permissions.IsAdminUser,)
+
 
 class TopicViewSet(viewsets.ModelViewSet):
     """

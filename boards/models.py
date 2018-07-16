@@ -26,6 +26,14 @@ class Board(models.Model):
         return Post.objects.filter(topic__board=self).order_by('-created_at').first()
 
 
+class History(models.Model):
+    action = models.CharField(max_length=255)
+    board_name = models.CharField(max_length=255)
+    action_at = models.DateTimeField(auto_now_add=True)
+
+
+
+
 class Topic(models.Model):
     subject = models.CharField(max_length=255)
     last_updated = models.DateTimeField(auto_now_add=True)
@@ -74,16 +82,18 @@ class Post(models.Model):
 
 @receiver(post_save, sender=Board)
 def board_create(sender, **kwargs):
+    board = Board.objects.get(pk=kwargs.get('instance').pk)
     if kwargs.get('created'):
-        board = Board.objects.get(pk=kwargs.get('instance').pk)
+        History.objects.create(action='Board created', board_name=board.name)
         print('Board created')
     elif not kwargs.get('created'):
-        board = Board.objects.get(pk=kwargs.get('instance').pk)
+        History.objects.create(action='Board updated', board_name=board.name)
         print('Board updated')
 
 
 @receiver(post_delete, sender=Board)
 def b_delete(sender, **kwargs):
+    History.objects.create(action='Board created', board_name=kwargs.get('instance').name)
     print('Board deleted')
 
 
