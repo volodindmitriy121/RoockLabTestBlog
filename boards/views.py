@@ -8,41 +8,41 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import UpdateView, ListView, DeleteView
 from django.utils.decorators import method_decorator
 
-from boards.models import Board, Post, Topic, BoardHistory
+from boards.models import Board, Post, Topic
 from .forms import NewTopicForm, PostForm, BoardForm
 from static.utils import check_recaptcha
 from rest_framework import permissions
-from .serializers import BoardSerializer, TopicSerializer, PostSerializer, BoardHistorySerializer
+from .serializers import BoardSerializer, TopicSerializer, PostSerializer
 from rest_framework import viewsets
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 
 
 # ---------------------------------------------------------------
 # Block of ajax boards views
 
-#
-# def action_send(request):
-#     # board = get_object_or_404(Board, pk=pk)
-#     data= {}
-#     if request.method == 'POST':
-#         data['result'] = request.POST.get('action')
-#         data['templete'] = render_to_string('action.html') #, {'board': board})
-#         return JsonResponse(data)
-#     else:
-#         HttpResponse(404)
+
+def action_send(request, pk):
+    board = get_object_or_404(Board, pk=pk)
+    data= {}
+    if request.method == 'POST':
+        data['result'] = request.POST.get('action')
+        data['templete'] = render_to_string('action.html', {'board': board})
+        return JsonResponse(data)
+    else:
+        pass
+
+
 
 
 def save_board_form(request, form, template_name):
     data = {}
     if request.method == "POST":
         if form.is_valid():
-            print('im in save board form')
-            print(request.user)
             form.save()
             data['form_is_valid'] = True
-            boards = Board.objects.all()
-            data['html_board_list'] = render_to_string('partial_board_list.html',
-                                                       {'boards': boards, 'user': request.user})
+
+            board = Board.objects.get(pk=form.instance.pk)
+            data['html_board_list'] = render_to_string('tr_board.html', {'board': board})
         else:
             data['form_is_valid'] = False
     context = {'form': form}
@@ -57,8 +57,6 @@ def board_list(request):
 
 def board_create(request):
     if request.method == 'POST':
-        print('im in board_cerate ')
-        print(request.user)
         form = BoardForm(request.POST)
     else:
         form = BoardForm()
@@ -81,7 +79,7 @@ def board_delete(request, pk):
         board.delete()
         data['form_is_valid'] = True
         boards = Board.objects.all()
-        data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards, 'user': request.user})
+        data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards})
     else:
         context = {'board': board}
         data['html_form'] = render_to_string('partial_board_delete.html', context, request=request)
@@ -188,6 +186,7 @@ def new_topic(request, pk):
                 topic=topic,
                 created_by=request.user
             )
+            post_save.connect(create_board, sender=Board)
             return redirect('topic_posts', pk=pk, topic_pk=topic.pk)
     else:
         form = NewTopicForm()
@@ -287,15 +286,6 @@ class BoardViewSet(viewsets.ModelViewSet):
     """
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
-    permission_classes = (permissions.IsAdminUser,)
-
-
-class BoardHistoryViewSet(viewsets.ModelViewSet):
-    """
-    API board history
-    """
-    queryset = BoardHistory.objects.all()
-    serializer_class = BoardHistorySerializer
     permission_classes = (permissions.IsAdminUser,)
 
 

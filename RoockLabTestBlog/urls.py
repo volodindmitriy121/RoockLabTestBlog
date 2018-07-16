@@ -1,11 +1,12 @@
 from django.urls import include
+
 from boards import views
 from django.contrib import admin
 from django.conf.urls import url
 from accounts import views as accounts_views
 from django.contrib.auth import views as auth_views
 
-from boards.views import TopicViewSet, BoardViewSet, PostViewSet, BoardHistoryViewSet
+from boards.views import TopicViewSet, BoardViewSet, PostViewSet
 
 post_list = PostViewSet.as_view({
     'get': 'list',
@@ -34,17 +35,6 @@ board_list = BoardViewSet.as_view({
     'post': 'create'
 })
 board_detail = BoardViewSet.as_view({
-    'get': 'retrieve',
-    'put': 'update',
-    'patch': 'partial_update',
-    'delete': 'destroy'
-})
-
-boardHistory_list = BoardHistoryViewSet.as_view({
-    'get': 'list',
-    'post': 'create'
-})
-boardHistory_detail = BoardHistoryViewSet.as_view({
     'get': 'retrieve',
     'put': 'update',
     'patch': 'partial_update',
@@ -112,10 +102,6 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/$', post_list, name='post-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/$', post_detail, name='post-detail'),
 
-    url(r'^api/history/$', boardHistory_list, name='board-history-list'),
-    url(r'^api/history/(?P<pk>\d+)/$', boardHistory_detail, name='board-history-detail'),
-
-    #url(r'^action/$', views.action_send, name='actions'),
 ]
 
 

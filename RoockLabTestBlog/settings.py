@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
     'social_django',
-    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [

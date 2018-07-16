@@ -35,7 +35,7 @@
         </thead>
         <tbody>
 
-        {% if user.is_superuser%}
+        {% if user.is_superuser %}
             {% include 'partial_board_list.html' %}
         {% else %}
             {% for board in boards %}
@@ -45,7 +45,7 @@
                         <small class="text-muted d-block">{{ board.description }}</small>
                     </td>
                     <td class="align-middle">
-                        {{ board.get_post_count }}
+                        {{ board.get_posts_count }}
                     </td>
                     <td class="align-middle">
                         {{ board.topics.count }}
