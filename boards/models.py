@@ -7,6 +7,9 @@ from django.dispatch import receiver
 from django.utils.text import Truncator
 from django.utils.html import mark_safe
 from markdown import markdown
+from rest_framework.authtoken.models import Token
+
+from django.conf import settings
 
 
 class Board(models.Model):
@@ -84,6 +87,10 @@ def b_delete(sender, **kwargs):
     print('Board deleted')
 
 
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
 
 
 # TODO: related name, auto_now_add
