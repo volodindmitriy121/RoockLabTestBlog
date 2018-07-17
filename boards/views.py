@@ -46,7 +46,7 @@ def save_board_form(request, form, template_name):
             action_json = History.objects.order_by('-action_at')[:5]
 
             data['html_actions'] = render_to_string('actions.html',
-                                               {'actions': action_json, 'user': request.user})
+                                                    {'actions': action_json, 'user': request.user})
 
             boards = Board.objects.all()
             data['html_board_list'] = render_to_string('partial_board_list.html',
@@ -68,7 +68,8 @@ def board_create(request):
         print('im in board_cerate ')
         print(request.user)
         form = BoardForm(request.POST)
-        send_email(request.user.email, 'Django Board', 'New board has been created', 'volodindmitriy121@gmail.com')
+        send_email.delay(request.user.email, 'Django Board', 'New board has been created',
+                   'volodindmitriy121@gmail.com')
     else:
         form = BoardForm()
     return save_board_form(request, form, 'partial_board_create.html')
@@ -92,7 +93,7 @@ def board_delete(request, pk):
         boards = Board.objects.all()
         action_json = History.objects.order_by('-action_at')[:5]
         data['html_actions'] = render_to_string('actions.html',
-                                           {'actions': action_json, 'user': request.user})
+                                                {'actions': action_json, 'user': request.user})
         data['html_board_list'] = render_to_string('partial_board_list.html', {'boards': boards, 'user': request.user})
     else:
         context = {'board': board}
@@ -125,7 +126,7 @@ def reply_post(request, pk, topic_pk):
     """
     data = {}
     topic = get_object_or_404(Topic, board__pk=pk, pk=topic_pk)
-    if request.me123thod == 'POST':
+    if request.method == 'POST':
         form = PostForm(request.POST)
 
         post = form.save(commit=False)

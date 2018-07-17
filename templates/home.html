@@ -12,7 +12,7 @@
                     type: 'get',
                     dataType: 'json',
                     success: function (data) {
-                        $('#action-list').html(data.html_actions);
+                        $('#action-list').html(data['html_actions']);
 
                     }
                 }
@@ -90,16 +90,9 @@
             </div>
             <div class="col-md">
                 <div class="text-right float-right col-md" id="action-list"></div>
-                {% include 'actions.html' %}
             </div>
         </div>
     </div>
-
-
-
-
-
-
 
     <div class="modal fade" id="modal-board">
         <div class="modal-dialog">
