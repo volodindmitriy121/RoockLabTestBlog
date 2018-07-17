@@ -11,11 +11,11 @@ from django.utils.decorators import method_decorator
 
 from boards.models import Board, Post, Topic, History
 from .forms import NewTopicForm, PostForm, BoardForm
-from static.utils import check_recaptcha, get_last_five_history
+from static.utils import check_recaptcha
 from rest_framework import permissions
 from .serializers import BoardSerializer, TopicSerializer, PostSerializer, HistorySerializer
 from rest_framework import viewsets
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from RoockLabTestBlog.tasks import send_email
 
 
@@ -69,7 +69,7 @@ def board_create(request):
         print(request.user)
         form = BoardForm(request.POST)
         send_email.delay(request.user.email, 'Django Board', 'New board has been created',
-                   'volodindmitriy121@gmail.com')
+                         'volodindmitriy121@gmail.com')
     else:
         form = BoardForm()
     return save_board_form(request, form, 'partial_board_create.html')
