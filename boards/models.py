@@ -93,7 +93,7 @@ def board_create(sender, **kwargs):
 
 @receiver(post_delete, sender=Board)
 def b_delete(sender, **kwargs):
-    History.objects.create(action='Board created', board_name=kwargs.get('instance').name)
+    History.objects.create(action='Board deleted', board_name=kwargs.get('instance').name)
     print('Board deleted')
 
 

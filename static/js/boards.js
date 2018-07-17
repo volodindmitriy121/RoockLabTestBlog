@@ -1,5 +1,7 @@
 $('document').ready(function () {
 
+
+
     let loadForm = function () {
         let btn = $(this);
         $.ajax({
@@ -25,7 +27,7 @@ $('document').ready(function () {
             dataType: 'json',
             success: function (data) {
                 if (data.form_is_valid) {
-                    console.log(data.html_actions);
+
                     $("#board-table tbody").html(data.html_board_list);
                     $('#action-list').html(data.html_actions);
                     $("#modal-board").modal("hide");

@@ -1,7 +1,19 @@
+<table class="table table-sm">
+    <thead class="thead-inverse text-center thead-light">
+    <tr>
+        <th>Recent actions</th>
+    </tr>
+    </thead>
 
-        {% for action in actions %}
-            <div>
-                <h1>{{ action.action }}</h1>
-                <h3>{{ action.board_name }}</h3>
-            </div>
-        {% endfor %}
+    <tbody>
+    {% for action in actions %}
+        <tr>
+            <td>
+                <h6>{{ action.action }}</h6>
+                <small class="text-muted d-block">{{ action.board_name }}</small>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+

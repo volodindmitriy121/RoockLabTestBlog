@@ -22,6 +22,17 @@ from django.http import JsonResponse, HttpResponse
 # Block of ajax boards views
 
 
+def history(request):
+    data = {}
+    if request.method == 'GET':
+        action_json = History.objects.order_by('-action_at')[:5]
+        data['html_actions'] = render_to_string('actions.html',
+                                                {'actions': action_json, 'user': request.user})
+        return JsonResponse(data)
+    else:
+        pass
+
+
 def save_board_form(request, form, template_name):
     data = {}
     if request.method == "POST":

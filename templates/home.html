@@ -4,6 +4,21 @@
 
 {% block javascript %}
     <script src="{% static 'js/boards.js' %}"></script>
+    <script>
+        $('document').ready(function () {
+
+            $.ajax({
+                    url: '/history/',
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#action-list').html(data.html_actions);
+
+                    }
+                }
+            )
+        });
+    </script>
 {% endblock %}
 
 
@@ -23,61 +38,68 @@
             New board
         </button>
     </p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-9">
+                <table class="table" id="board-table">
+                    <thead class="thead-inverse">
+                    <tr>
+                        <th>Board</th>
+                        <th>Posts</th>
+                        <th>Topics</th>
+                        <th>Last Post</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-    <table class="table" id="board-table">
-        <thead class="thead-inverse">
-        <tr>
-            <th>Board</th>
-            <th>Posts</th>
-            <th>Topics</th>
-            <th>Last Post</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        {% if user.is_superuser %}
-            {% include 'partial_board_list.html' %}
-        {% else %}
-            {% for board in boards %}
-                <tr>
-                    <td>
-                        <a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a>
-                        <small class="text-muted d-block">{{ board.description }}</small>
-                    </td>
-                    <td class="align-middle">
-                        {{ board.get_post_count }}
-                    </td>
-                    <td class="align-middle">
-                        {{ board.topics.count }}
-                    </td>
-                    <td class="align-middle">
-                        {% with post=board.get_last_post %}
-                            {% if post %}
-                                <small>
-                                    <a href="{% url 'topic_posts' board.pk post.topic.pk %}">
-                                        By {{ post.created_by.username }} at {{ post.created_at }}
-                                    </a>
-                                </small>
-                            {% else %}
-                                <small class="text-muted">
-                                    <em>No posts yet</em>
-                                </small>
-                            {% endif %}
-                        {% endwith %}
-                    </td>
-                </tr>
-            {% endfor %}
-        {% endif %}
-        </tbody>
-    </table>
-
-<div class="text-right">
-    <div class="module" id="recent-actions-module">
-        <h2>Recent actions</h2>
-        <div id="action-list"></div>
-        {% include 'actions.html' %}
+                    {% if user.is_superuser %}
+                        {% include 'partial_board_list.html' %}
+                    {% else %}
+                        {% for board in boards %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'board_topics' board.pk %}">{{ board.name }}</a>
+                                    <small class="text-muted d-block">{{ board.description }}</small>
+                                </td>
+                                <td class="align-middle">
+                                    {{ board.get_post_count }}
+                                </td>
+                                <td class="align-middle">
+                                    {{ board.topics.count }}
+                                </td>
+                                <td class="align-middle">
+                                    {% with post=board.get_last_post %}
+                                        {% if post %}
+                                            <small>
+                                                <a href="{% url 'topic_posts' board.pk post.topic.pk %}">
+                                                    By {{ post.created_by.username }} at {{ post.created_at }}
+                                                </a>
+                                            </small>
+                                        {% else %}
+                                            <small class="text-muted">
+                                                <em>No posts yet</em>
+                                            </small>
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md">
+                <div class="text-right float-right col-md" id="action-list"></div>
+                {% include 'actions.html' %}
+            </div>
+        </div>
     </div>
-</div>
+
+
+
+
+
+
 
     <div class="modal fade" id="modal-board">
         <div class="modal-dialog">

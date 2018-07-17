@@ -103,6 +103,8 @@ urlpatterns = [
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/delete/$',
         views.delete_post, name='post_delete'),
 
+    url(r'^history/$', views.history, name='history'),
+
     url('admin/', admin.site.urls),
 
 
@@ -116,6 +118,8 @@ urlpatterns = [
 
     url(r'^api/history/$', history_list, name='history-list'),
     url(r'^api/history/(?P<pk>\d+)/$', history_detail, name='history-detail'),
+
+
 
 ]
 
