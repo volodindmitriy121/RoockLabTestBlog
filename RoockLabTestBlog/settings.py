@@ -26,7 +26,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=False)
 
-
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'django-db'
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'social_django',
     'rest_framework.authtoken',
+    'celery',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -188,4 +191,11 @@ LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
 LOGOUT_REDIRECT_URL = 'home'
 LOGIN_REDIRECT_URL = 'home'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'volodindmitriy121@gmail.com'
+EMAIL_HOST_PASSWORD = config('PASS')
+EMAIL_USE_TLS = True

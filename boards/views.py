@@ -16,6 +16,7 @@ from rest_framework import permissions
 from .serializers import BoardSerializer, TopicSerializer, PostSerializer, HistorySerializer
 from rest_framework import viewsets
 from django.http import JsonResponse, HttpResponse
+from RoockLabTestBlog.tasks import send_email
 
 
 # ---------------------------------------------------------------
@@ -67,6 +68,7 @@ def board_create(request):
         print('im in board_cerate ')
         print(request.user)
         form = BoardForm(request.POST)
+        send_email(request.user.email, 'Django Board', 'New board has been created', 'volodindmitriy121@gmail.com')
     else:
         form = BoardForm()
     return save_board_form(request, form, 'partial_board_create.html')
