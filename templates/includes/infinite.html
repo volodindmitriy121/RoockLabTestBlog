@@ -13,17 +13,22 @@
 
 {% block javascript %}
 
+
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/jquery.waypoints.min.js' %}"></script>
     <script src="{% static 'js/infinite.min.js' %}"></script>
     <script>
+    jQuery.noConflict();
         var infinite = new Waypoint.Infinite({
-            element: $('.infinite-container')[0],
+            element: jQuery('.infinite-container')[0],
             onBeforePageLoad: function () {
-                $('.loader').show();
+                jQuery('.loader').show();
             },
 
             onAfterPageLoad: function ($items) {
-                $('.loader').hide();
+                jQuery('.loader').hide();
             }
         });
     </script>
