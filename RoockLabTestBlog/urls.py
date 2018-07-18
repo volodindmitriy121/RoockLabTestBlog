@@ -1,3 +1,5 @@
+from django.urls import include
+
 from boards import views
 from django.contrib import admin
 from django.conf.urls import url
@@ -103,6 +105,8 @@ urlpatterns = [
     #  ------------------Admin---------------------------
     url('admin/', admin.site.urls),
 
+    #  ------------------Social auth---------------------------
+    url(r'^oauth/', include('social_django.urls', namespace='social')),
 
     #  ------------------API---------------------------
     url(r'^api/$', board_list, name='board-list'),
