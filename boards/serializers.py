@@ -24,4 +24,3 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
         fields = ('url', 'id', 'board_name', 'action', 'action_at')
-

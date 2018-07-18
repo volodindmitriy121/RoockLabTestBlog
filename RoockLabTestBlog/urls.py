@@ -1,5 +1,3 @@
-from django.urls import include
-
 from boards import views
 from django.contrib import admin
 from django.conf.urls import url
@@ -53,28 +51,30 @@ history_detail = HistoryViewSet.as_view({
 })
 
 
-
 urlpatterns = [
-    # url(r'^$', views.BoardListView.as_view(), name='home'),
+
+    #  ------------------CRUD board---------------------------
     url(r'^$', views.board_list, name='home'),
     url(r'^boards/create/$', views.board_create, name='board_create'),
     url(r'^boards/(?P<pk>\d+)/update/$', views.board_update, name='board_update'),
     url(r'^boards/(?P<pk>\d+)/delete/$', views.board_delete, name='board_delete'),
 
-    url(r'^oauth/', include('social_django.urls', namespace='social')),
-
-
+    #  ------------------CRUD post---------------------------
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', views.PostListView.as_view(), name='topic_posts'),
-
     url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/reply/$', views.reply_post, name='reply_topic'),
+    url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
+        views.PostUpdateView.as_view(), name='edit_post'),
+    url(r'^posts/(?P<post_pk>\d+)/delete/$',
+        views.delete_post, name='post_delete'),
 
+    #  ------------------Sign | Log in---------------------------
     url(r'^signup/staff/$', accounts_views.staff_signup, name='staff-signup'),
     url(r'^signup/$', accounts_views.signup, name='signup'),
     url(r'^login/$', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
 
+    #  ------------------Settings---------------------------
     url(r'^settings/account/$', accounts_views.UserUpdateView.as_view(), name='my_account'),
-
     url(r'^reset/$', auth_views.PasswordResetView.as_view(template_name='password_reset.html',
                                                           email_template_name='password_reset_email.html',
                                                           subject_template_name='password_reset_subject.txt'),
@@ -93,18 +93,14 @@ urlpatterns = [
         auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
         name='password_change_done'),
 
+    #  ------------------Create | Read topic---------------------------
     url(r'^boards/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
     url(r'^boards/(?P<pk>\d+)/$', views.TopicListView.as_view(), name='board_topics'),
 
-
-
-    url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/edit/$',
-        views.PostUpdateView.as_view(), name='edit_post'),
-    url(r'^boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/delete/$',
-        views.delete_post, name='post_delete'),
-
+    #  ------------------Get history---------------------------
     url(r'^history/$', views.history, name='history'),
 
+    #  ------------------Admin---------------------------
     url('admin/', admin.site.urls),
 
 
@@ -115,12 +111,8 @@ urlpatterns = [
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/$', topic_detail, name='topic-detail'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/$', post_list, name='post-list'),
     url(r'^api/boards/(?P<pk>\d+)/topics/(?P<topic_pk>\d+)/posts/(?P<post_pk>\d+)/$', post_detail, name='post-detail'),
-
     url(r'^api/history/$', history_list, name='history-list'),
     url(r'^api/history/(?P<pk>\d+)/$', history_detail, name='history-detail'),
-
-
-
 ]
 
 

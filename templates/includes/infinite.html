@@ -1,8 +1,10 @@
 {% load static %}
 
 {% block aftercontent %}
-    <div class="loader"></div>
+
+
     {% if page_obj.has_next %}
+        <div class="loader"></div>
         <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}">More</a>
     {% endif %}
 
@@ -22,6 +24,7 @@
             onBeforePageLoad: function () {
                 $('.loader').show();
             },
+
             onAfterPageLoad: function ($items) {
                 $('.loader').hide();
             }

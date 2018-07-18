@@ -4,7 +4,6 @@
 
 {% load humanize %}
 
-    
 
 {% block title %}
     {{ board.name }} - {{ block.super }}
@@ -23,21 +22,22 @@
 
 
     <div class="container">
-        <div class="row">
+        <div class="row border-top border-bottom text-dark  py-3">
+
             <div class="col-sm">
-                Topic
+                <strong>Topic</strong>
             </div>
             <div class="col-sm">
-                Starter
+                <strong>Starter</strong>
             </div>
             <div class="col-sm">
-                Replies
+                <strong>Replies</strong>
             </div>
             <div class="col-sm">
-                Views
+                <strong>Views</strong>
             </div>
             <div class="col-sm">
-                Last update
+                <strong>Last update</strong>
             </div>
         </div>
     </div>
@@ -48,14 +48,13 @@
 
             {% url 'topic_posts' board.pk topic.pk as topic_url %}
 
-            <div class="infinite-item">
-                <div class="row">
-
+            <div class="infinite-item col-md">
+                <div class="row py-3 border-bottom">
                     <div class="col-sm">
                         <p class="mb-0">
                             <a href="{{ topic_url }}">{{ topic.subject }}</a>
                         </p>
-                        <small class="text-muted">
+                         <small class="text-muted">
                             Pages:
                             {% for i in topic.get_page_range %}
                                 <a href="{{ topic_url }}?page={{ i }}">{{ i }}</a>
@@ -64,10 +63,11 @@
                                 ...<a href="{{ topic_url }}?page={{ topic.get_page_count }}">Last Page</a>
                             {% endif %}
                         </small>
+
                     </div>
 
                     <div class="col-sm">{{ topic.starter.username }}</div>
-                    <div class="col-sm">{{ topic.replies }}</div>
+                    <div class="col-sm">{{ topic.replies}}</div>
                     <div class="col-sm">{{ topic.views }}</div>
                     <div class="col-sm">{{ topic.last_updated|naturaltime }}</div>
                 </div>

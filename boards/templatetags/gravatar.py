@@ -1,8 +1,6 @@
 import hashlib
 from urllib.parse import urlencode
-
 from django import template
-from django.conf import settings
 
 register = template.Library()
 
@@ -17,4 +15,3 @@ def gravatar(user):
         params=urlencode({'d': default, 's': str(size)})
     )
     return url
-

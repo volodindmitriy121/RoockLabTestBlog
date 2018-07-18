@@ -47,11 +47,14 @@
                                         {% if user.is_superuser or user.is_staff %}
                                             <form>
                                                 {% csrf_token %}
+                                                <p>im here with {{ post.pk }} id and {{ user.username }} user</p>
                                                 <div class="btn btn-danger btn-sm delete-post"
-                                                     data-url="{% url 'post_delete' post.topic.board.pk post.topic.pk post.pk %}">
+                                                     data-url="{% url 'post_delete' post.pk %}"
+                                                    onclick="deletePost($(this))">
                                                     Delete
                                                 </div>
                                             </form>
+
                                         {% endif %}
                                     </div>
                                 </div>
@@ -72,45 +75,30 @@
 
     </div>
 
-    {#    {% include 'includes/pagination.html' %}#}
-    {% include 'includes/infinite.html' %}
+
 {% endblock %}
-{% block aftercontent %}{% endblock %}
+{% block aftercontent %}    {% include 'includes/infinite.html' %}{% endblock %}
 {% block javascript %}
     <script>
 
-        $('document').ready(function () {
+        function deletePost(btn) {
 
+            $.ajax({
+                url: btn.attr("data-url"),
+                type: "DELETE",
+                dataType: 'json',
+                headers: {
+                    "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val()
+                },
 
-            $('.delete-post').on('click', function () {
-                let btn = $(this);
-                console.log(btn.attr("data-url"));
-
-                deletePost(btn)
+                success: function (data) {
+                    $("#" + data['post_id'].toString()).remove();
+                },
             });
 
-            function deletePost(btn) {
 
-                console.log('hui');
-                console.log($('input[name=csrfmiddlewaretoken]').val());
-                $.ajax({
-                    url: btn.attr("data-url"), // the endpoint
-                    type: "DELETE", // http method
-                    dataType: 'json',
-                    headers: {
-                        "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val()
-                    },
+        }
 
-
-                    success: function (data) {
-                        $("#" + data['post_id'].toString()).remove();
-                        console.log(data)
-                    },
-                });
-
-
-            }
-        });
     </script>
 {% endblock %}
 

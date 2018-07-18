@@ -1,4 +1,3 @@
-from django.core import serializers
 from django.db.models import Count
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -38,8 +37,6 @@ def save_board_form(request, form, template_name):
     data = {}
     if request.method == "POST":
         if form.is_valid():
-            print('im in save board form')
-            print(request.user)
             form.save()
             data['form_is_valid'] = True
 
@@ -65,8 +62,6 @@ def board_list(request):
 
 def board_create(request):
     if request.method == 'POST':
-        print('im in board_cerate ')
-        print(request.user)
         form = BoardForm(request.POST)
         send_email.delay(request.user.email, 'Django Board', 'New board has been created',
                          'volodindmitriy121@gmail.com')
@@ -102,7 +97,10 @@ def board_delete(request, pk):
     return JsonResponse(data)
 
 
-def delete_post(request, pk, topic_pk, post_pk):
+# --------------------------------------------------------------
+
+
+def delete_post(request, post_pk):
     data = {}
     post = get_object_or_404(Post, pk=post_pk)
     if request.method == 'DELETE':
@@ -114,9 +112,6 @@ def delete_post(request, pk, topic_pk, post_pk):
         return JsonResponse(data)
     else:
         return JsonResponse({'result': 'nothing happened'})
-
-
-# --------------------------------------------------------------
 
 
 @login_required
@@ -138,19 +133,16 @@ def reply_post(request, pk, topic_pk):
         topic.save()
 
         data['template'] = render_to_string('rep_post.html', {'post': post})
-        data['message'] = request.POST.get('the_post')
-        data['topic'] = str(post.topic)
-        data['created_by'] = post.created_by.username
-        data['created_at'] = post.created_at
+        # data['message'] = request.POST.get('the_post')
+        # data['topic'] = str(post.topic)
+        # data['created_by'] = post.created_by.username
+        # data['created_at'] = post.created_at
 
         return JsonResponse(data)
     else:
 
         form = PostForm()
     return render(request, 'reply_topic.html', {'topic': topic, 'form': form})
-
-
-# --------------------------------------------------------------
 
 
 class BoardListView(ListView):
@@ -177,7 +169,7 @@ class TopicListView(ListView):
 
     def get_queryset(self):
         self.board = get_object_or_404(Board, pk=self.kwargs.get('pk'))
-        queryset = self.board.topics.order_by('-last_updated').annotate(replies=Count('posts') - 1)
+        queryset = self.board.topics.order_by('-last_updated').annotate(replies=Count('posts'))
         return queryset
 
 
@@ -213,7 +205,7 @@ class PostListView(ListView):
     boards/pk/topics/pk
     """
     model = Post
-    paginate_by = 1
+    paginate_by = 3
     context_object_name = 'posts'
     template_name = 'topic_posts.html'
 

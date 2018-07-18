@@ -48,6 +48,9 @@
                         <th>Posts</th>
                         <th>Topics</th>
                         <th>Last Post</th>
+                        {% if user.is_superuser %}
+                        <th></th>
+                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>

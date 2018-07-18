@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 
+
 {% load static %}
 
 
 {% block title %}Post a reply{% endblock %}
+
 
 {% block stylesheet %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
@@ -17,33 +19,29 @@
     </script>
     <script>
 
-        $('#reply_post').on('click', function () {
+        $('#post-submit').on('submit', function (e) {
+            e.preventDefault()
             createPost();
         });
 
         function createPost() {
             $.ajax({
                 url: "{% url  'reply_topic' topic.board.pk  topic.pk%}",
-                type: "POST", // http method
+                type: "POST",
                 dataType: 'json',
                 data: {
                     message: $('#post-text').val(),
                     csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
                 },
                 success: function (data) {
-                    console.log(data)
-
                     var newDiv = document.createElement("div");
                     newDiv.innerHTML = data['template'];
                     $("#posts").prepend(newDiv);
                 },
             });
-
-
         }
     </script>
 {% endblock %}
-
 
 
 {% block breadcrumb %}
@@ -55,10 +53,10 @@
 
 
 {% block content %}
-    <form method="post" class="mb-4">
+    <form method="post" class="mb-4" id="post-submit">
         {% csrf_token %}
         {% include 'includes/form.html' %}
-        <div class="btn btn-success" id="reply_post">Post a reply</div>
+        <div class="btn btn-success" onclick="createPost()" id="reply_post">Post a reply</div>
     </form>
     <div id="posts">
         {% for post in topic.get_last_ten_posts %}

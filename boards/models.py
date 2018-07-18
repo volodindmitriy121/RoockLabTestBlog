@@ -32,8 +32,6 @@ class History(models.Model):
     action_at = models.DateTimeField(auto_now_add=True)
 
 
-
-
 class Topic(models.Model):
     subject = models.CharField(max_length=255)
     last_updated = models.DateTimeField(auto_now_add=True)
@@ -101,9 +99,3 @@ def b_delete(sender, **kwargs):
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
         Token.objects.create(user=instance)
-
-
-# TODO: related name, auto_now_add
-'''The double underscores topic__board is used to navigate through the models’ relationships. Under the hoods, 
-Django builds the bridge between the Board - Topic - Post, and build a SQL query 
-to retrieve just the posts that belong to a specific board.'''
