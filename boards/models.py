@@ -2,9 +2,14 @@ import math
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
 from django.utils.text import Truncator
 from django.utils.html import mark_safe
 from markdown import markdown
+from rest_framework.authtoken.models import Token
+
+from django.conf import settings
 
 
 class Board(models.Model):
@@ -19,6 +24,12 @@ class Board(models.Model):
 
     def get_last_post(self):
         return Post.objects.filter(topic__board=self).order_by('-created_at').first()
+
+
+class History(models.Model):
+    action = models.CharField(max_length=255)
+    board_name = models.CharField(max_length=255)
+    action_at = models.DateTimeField(auto_now_add=True)
 
 
 class Topic(models.Model):
@@ -67,7 +78,24 @@ class Post(models.Model):
         return mark_safe(markdown(self.message, safe_mode='escape'))
 
 
-# TODO: related name, auto_now_add
-'''The double underscores topic__board is used to navigate through the models’ relationships. Under the hoods, 
-Django builds the bridge between the Board - Topic - Post, and build a SQL query 
-to retrieve just the posts that belong to a specific board.'''
+@receiver(post_save, sender=Board)
+def board_create(sender, **kwargs):
+    board = Board.objects.get(pk=kwargs.get('instance').pk)
+    if kwargs.get('created'):
+        History.objects.create(action='Board created', board_name=board.name)
+        print('Board created')
+    elif not kwargs.get('created'):
+        History.objects.create(action='Board updated', board_name=board.name)
+        print('Board updated')
+
+
+@receiver(post_delete, sender=Board)
+def b_delete(sender, **kwargs):
+    History.objects.create(action='Board deleted', board_name=kwargs.get('instance').name)
+    print('Board deleted')
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)

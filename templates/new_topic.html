@@ -9,10 +9,15 @@
 {% endblock %}
 
 {% block content %}
-   <form method="post" novalidate>
+    <form method="post" novalidate>
         {% csrf_token %}
         {% include 'includes/form.html' %}
-        <button type="submit" class="btn btn-success">Post</button>
-   </form>
+        <script src='https://www.google.com/recaptcha/api.js'></script>
+        <div class="g-recaptcha " data-sitekey="6LfceWIUAAAAAJcyYcafZfV1gFIqI915TysR8ihQ"></div>
+        <br>
+        <button type="submit" class="btn btn-success" id="new-topic-btn" data-url="{% url 'board_topics' board.pk %}">
+            Post
+        </button>
+    </form>
 {% endblock %}
 

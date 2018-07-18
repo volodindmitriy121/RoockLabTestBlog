@@ -12,3 +12,20 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - redis
+
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/bash -c "celery -A RoockLabTestBlog worker -B --loglevel=info & wait"
+    volumes:
+      - .:/app:Z
+    links:
+      - redis
+    depends_on:
+      - redis
